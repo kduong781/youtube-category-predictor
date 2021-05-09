@@ -200,6 +200,7 @@
     "from sklearn.feature_extraction.text import CountVectorizer\n",
     "from sklearn.model_selection import train_test_split\n",
     "from sklearn.linear_model import RidgeClassifier\n",
+    "from sklearn.metrics import f1_score\n",
     "\n",
     "file = 'video_data.csv'\n",
     "data = pd.read_csv(file)"
@@ -213,7 +214,7 @@
    "outputs": [],
    "source": [
     "data[\"All\"] = data[\"Tags\"] + \";\" + data[\"Video Title\"] + \";\" +  data[\"Description\"] + \";\" +  data[\"Channel Title\"]\n",
-    "vectorizer = CountVectorizer(stop_words= \"english\")\n",
+    "vectorizer = CountVectorizer(stop_words = \"english\")\n",
     "all_features = vectorizer.fit_transform(data['All'].fillna(' '))"
    ]
   },
@@ -234,25 +235,41 @@
    "metadata": {},
    "outputs": [
     {
-     "data": {
-      "text/plain": [
-       "0.813500347947112"
-      ]
-     },
-     "execution_count": 16,
-     "metadata": {},
-     "output_type": "execute_result"
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Score:  0.813500347947112\n"
+     ]
     }
    ],
    "source": [
     "clf = RidgeClassifier()\n",
     "clf.fit(x_train, y_train)\n",
-    "clf.score(x_test, y_test)"
+    "print(\"Score: \", clf.score(x_test, y_test))"
    ]
   },
   {
    "cell_type": "code",
    "execution_count": 17,
+   "id": "fundamental-naples",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "F1-Score:  0.8128046182160169\n"
+     ]
+    }
+   ],
+   "source": [
+    "f1 = f1_score(y_test, clf.predict(x_test),average='weighted')\n",
+    "print(\"F1-Score: \", f1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
    "id": "communist-british",
    "metadata": {},
    "outputs": [],
@@ -278,7 +295,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 18,
+   "execution_count": 19,
    "id": "terminal-branch",
    "metadata": {},
    "outputs": [
@@ -286,30 +303,30 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "Lebron James is most likely category: ('People & Blogs', -0.6764663906199333)\n",
+      "Bruce Almighty is most likely category: ('Film & Animation', -0.7004480474297617)\n",
       " \n",
       "Probabilities\n",
-      "People & Blogs -0.6764663906199333\n",
-      "Comedy -0.7038144439106047\n",
-      "Entertainment -0.7549345045905058\n",
-      "Music -0.7660967302827812\n",
-      "News & Politics -0.8140101797525523\n",
-      "Film & Animation -0.8201220906879938\n",
-      "Science & Technology -0.8576223491286075\n",
-      "Howto & Style -0.8629135454433114\n",
-      "Sports -0.9205925285442761\n",
-      "Pets & Animals -0.9397747250689081\n",
-      "Nonprofits & Activism -0.9591450213072201\n",
-      "Education -0.9749585454076392\n",
-      "Autos & Vehicles -0.9799701975629499\n",
-      "Gaming -0.9849542224688872\n",
-      "Travel & Events -0.9861592287242417\n",
-      "Shows -0.9983801355891334\n"
+      "Film & Animation -0.7004480474297617\n",
+      "Comedy -0.703984581394164\n",
+      "People & Blogs -0.7081659753366822\n",
+      "Music -0.789464434173631\n",
+      "News & Politics -0.7957693217413303\n",
+      "Entertainment -0.8055363904012073\n",
+      "Science & Technology -0.8557779898073826\n",
+      "Howto & Style -0.8612202522747542\n",
+      "Sports -0.9095875033736662\n",
+      "Pets & Animals -0.9422461155268652\n",
+      "Nonprofits & Activism -0.9596180703296594\n",
+      "Education -0.9741954172424933\n",
+      "Autos & Vehicles -0.9790799844888034\n",
+      "Travel & Events -0.991613746264356\n",
+      "Shows -0.9981007357587095\n",
+      "Gaming -1.024950957519269\n"
      ]
     }
    ],
    "source": [
-    "checkCategory(\"Lebron James\")"
+    "checkCategory(\"Bruce Almighty\")"
    ]
   },
   {
