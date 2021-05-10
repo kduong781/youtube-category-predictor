@@ -69,11 +69,11 @@ def main():
     target_category_id = None
 
     try:
-        video = api_response.get("items", None)[0] # might be an empty array
+        video = api_response.get("items")[0]
         target_title = video["snippet"]["title"]
         target_description = video["snippet"]["description"]
-        target_tags = ' '.join(video["tags"])
-        target_category_id = video["categoryId"]
+        target_tags = ' '.join(video["snippet"]["tags"])
+        target_category_id = video["snippet"]["categoryId"]
     except Exception:
         print(f'No results found for\nvideo_id:{args.video_id}\ncountry_code:{args.country_code}\n')
         sys.exit()
