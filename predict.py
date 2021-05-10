@@ -10,6 +10,28 @@ import string
 import pandas as pd
 import numpy as np
 import re
+import requests
+import sys
+
+def setup(api_path):
+    '''
+        Get api key
+    '''
+    with open(api_path, 'r') as file:
+        api_key = file.readline()
+
+    return api_key
+
+def api_request(video_id, api_key, country_code):
+    '''
+        Requests info on a youtube video
+    '''
+    request_url = f"https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&id={video_id}&regionCode={country_code}&key={api_key}"
+    request = requests.get(request_url)
+    if request.status_code == 429:
+        print("Temp-Banned due to excess requests, please wait and continue later")
+        sys.exit()
+    return request.json()
 
 def clean(title):
     '''
@@ -32,17 +54,36 @@ def clean(title):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("title", help="title of youtbe video to predict")
-    parser.add_argument("description", help="description of youtbe video to predict")
+    parser.add_argument("video_id", help="id of youtube video to predict")
+    parser.add_argument("country_code", help="region that the video is from")
+    # parser.add_argument("title", help="title of youtbe video to predict")
+    # parser.add_argument("description", help="description of youtbe video to predict")
     parser.add_argument("-v", "--verbose", default=False, action='store_true', help="adds more information to output")
     args = parser.parse_args()
+
+    api_key = setup('./apikey')
+    api_response = api_request(args.video_id, api_key, args.country_code)
+    target_title = None
+    target_description = None
+    target_tags = None
+    target_category_id = None
+
+    try:
+        video = api_response.items[0] # might be an empty array
+        target_title = video["snippet"]["title"]
+        target_description = video["snippet"]["description"]
+        target_tags = ' '.join(video["tags"])
+        target_category_id = video["categoryId"]
+    except Exception:
+        print(f'No results found for\nvideo_id:{args.video_id}\ncountry_code:{args.country_code}\n')
+        sys.exit()
 
     model = None
     tfidf_title = None
     tfidf_description = None
     tfidf_tags = None
     categories = None
-    labels = [None] * 32
+    labels = [None] * 45
 
     with open('data/linearSVC.pkl', 'rb') as f:
         model = pickle.load(f)
@@ -65,9 +106,14 @@ def main():
     if not model or not tfidf_title or not tfidf_description or not tfidf_tags or not categories:
         print('pickles did not successfully load. Please ensure the .pkl and json files are located in ./data/')
 
+    clean_title = [clean(target_title)]
+    clean_description = [clean(target_description)]
+    clean_tags = [clean(target_tags)]
+    '''
     clean_title = [clean(args.title.strip())]
     clean_description = [clean(args.description.strip())]
     clean_tags = [clean('')]
+    '''
 
     vect_title = tfidf_title.transform(clean_title).toarray()
     vect_description = tfidf_description.transform(clean_description).toarray()
@@ -76,12 +122,14 @@ def main():
 
     if args.verbose:
         print(sample.shape)
-    
+
     pred = model.predict(sample)[0]
     if args.verbose:
         print(pred)
 
     print(labels[pred])
+
+    print(f'Target category: {labels[int(target_category_id)]}')
 
 if __name__ == '__main__':
     main()
