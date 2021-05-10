@@ -61,7 +61,7 @@ def main():
     parser.add_argument("-v", "--verbose", default=False, action='store_true', help="adds more information to output")
     args = parser.parse_args()
 
-    api_key = setup('./apikey')
+    api_key = setup('apikey')
     api_response = api_request(args.video_id, api_key, args.country_code)
     target_title = None
     target_description = None
@@ -69,7 +69,7 @@ def main():
     target_category_id = None
 
     try:
-        video = api_response.items[0] # might be an empty array
+        video = api_response.get("items", None)[0] # might be an empty array
         target_title = video["snippet"]["title"]
         target_description = video["snippet"]["description"]
         target_tags = ' '.join(video["tags"])
