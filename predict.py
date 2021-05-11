@@ -56,8 +56,6 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("video_id", help="id of youtube video to predict")
     parser.add_argument("country_code", help="region that the video is from")
-    # parser.add_argument("title", help="title of youtbe video to predict")
-    # parser.add_argument("description", help="description of youtbe video to predict")
     parser.add_argument("-v", "--verbose", default=False, action='store_true', help="adds more information to output")
     args = parser.parse_args()
 
@@ -109,11 +107,6 @@ def main():
     clean_title = [clean(target_title)]
     clean_description = [clean(target_description)]
     clean_tags = [clean(target_tags)]
-    '''
-    clean_title = [clean(args.title.strip())]
-    clean_description = [clean(args.description.strip())]
-    clean_tags = [clean('')]
-    '''
 
     vect_title = tfidf_title.transform(clean_title).toarray()
     vect_description = tfidf_description.transform(clean_description).toarray()
