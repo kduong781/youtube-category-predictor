@@ -15,6 +15,8 @@
 ### Instructions
 
 - Install dependencies for the python script (sklearn, nltk, pandas, numpy, requests)
+- Create a Google account and [request an api key](https://developers.google.com/youtube/v3/getting-started)
+- Save the api key in `./apikey`
 - Run the script `python3 predict.py {video_id} {country_code}`
 - Example1: `python3 predict.py 09GQGlHTVlY US`
 - Example2: `python3 predict.py Eq6bUjPQjkk US`
